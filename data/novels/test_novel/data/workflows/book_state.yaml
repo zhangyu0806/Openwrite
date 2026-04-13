@@ -1,8 +1,0 @@
-novel_id: test_novel
-stage: chapter_preflight
-current_arc: arc_001
-current_section: sec_002
-current_chapter: ch_007
-pending_confirmation: ''
-blocking_reason: ''
-last_agent_action: recorded_ideation
