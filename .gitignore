@@ -84,3 +84,9 @@ data/novels/*/data/test_outputs/
 
 # Local worktrees
 .worktrees/
+
+# Personal conversation history and private novel settings
+某次对话历史.md
+幕间编修者_回响剧情_最终版.md
+*.私人设定.md
+*对话历史*.md
