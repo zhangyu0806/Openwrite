@@ -1107,10 +1107,11 @@ class OpenWriteOrchestrator:
         *,
         temperature: float,
         max_tokens: int,
+        role: str = "outline",
     ) -> str:
         from ..llm import LLMClient, LLMConfig, Message
 
-        config = LLMConfig.from_env()
+        config = LLMConfig.from_env(role=role)
         client = LLMClient(config)
         response = client.chat(
             messages=[

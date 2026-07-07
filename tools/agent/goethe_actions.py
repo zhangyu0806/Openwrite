@@ -281,7 +281,7 @@ class GoethePlanningRuntime:
     def _get_architect(self) -> ArchitectAgent:
         if self._architect is not None:
             return self._architect
-        llm_config = LLMConfig.from_env()
+        llm_config = LLMConfig.from_env(role="outline")
         client = LLMClient(llm_config)
         ctx = AgentContext(client, llm_config.model, str(self.project_root))
         self._architect = ArchitectAgent(ctx)

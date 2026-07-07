@@ -475,7 +475,7 @@ def _cmd_multi_write(args) -> int:
             from tools.llm import LLMClient, LLMConfig
             from tools.agent import AgentContext, MultiAgentDirector
 
-            llm_config = LLMConfig.from_env()
+            llm_config = LLMConfig.from_env(role="writer")
             client = LLMClient(llm_config)
             agent_ctx = AgentContext(client, llm_config.model, str(project_root))
             director = MultiAgentDirector(agent_ctx, novel_id=novel_id, style_id=style_id)
@@ -1124,8 +1124,12 @@ def _cmd_doctor(args) -> int:
         masked = f"{api_key[:4]}...{api_key[-4:]}" if len(api_key) > 8 else "***"
 
     logger.info(f"LLM_PROVIDER: {provider or '<missing>'}")
-    logger.info(f"LLM_MODEL: {model or '<missing>'}")
+    logger.info(f"LLM_MODEL (默认/大纲): {model or '<missing>'}")
     logger.info(f"LLM_API_KEY: {masked}")
+
+    writer_model = (os.environ.get("LLM_MODEL_WRITER") or "").strip()
+    if writer_model:
+        logger.info(f"LLM_MODEL_WRITER (写作): {writer_model}")
 
     return 0
 
@@ -1759,7 +1763,7 @@ def _exec_write_chapter(project_root: Path, args: dict) -> dict:
     truth = truth_manager.load_truth_files()
 
     try:
-        llm_config = LLMConfig.from_env()
+        llm_config = LLMConfig.from_env(role="writer")
         client = LLMClient(llm_config)
         agent_ctx = AgentContext(client, llm_config.model, str(project_root))
 

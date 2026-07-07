@@ -88,19 +88,32 @@ class LLMConfig:
         self.base_url = self._normalize_base_url(self.base_url)
 
     @classmethod
-    def from_env(cls) -> "LLMConfig":
-        """从环境变量创建配置"""
+    def from_env(cls, role: str | None = None) -> "LLMConfig":
+        """从环境变量创建配置。
+
+        role 非空时，每个设置优先读取 `<VAR>_<ROLE>`（大写），缺失则回退到全局
+        `<VAR>`。例：role="writer" 时 LLM_MODEL_WRITER 覆盖 LLM_MODEL，
+        LLM_BASE_URL_WRITER 覆盖 LLM_BASE_URL，API_KEY / PROVIDER 同理。
+        """
+
+        def pick(base_name: str, default: str) -> str:
+            if role:
+                role_val = os.getenv(f"{base_name}_{role.upper()}")
+                if role_val is not None and role_val != "":
+                    return role_val
+            return os.getenv(base_name, default)
+
         return cls(
-            provider=os.getenv("LLM_PROVIDER", "openai"),
-            api_key=os.getenv("LLM_API_KEY", ""),
-            base_url=os.getenv("LLM_BASE_URL", "https://api.openai.com/v1"),
-            model=os.getenv("LLM_MODEL", "gpt-4o-mini"),
-            temperature=float(os.getenv("LLM_TEMPERATURE", "0.7")),
-            max_tokens=int(os.getenv("LLM_MAX_TOKENS", "24000")),
-            stream=os.getenv("LLM_STREAM", "true").lower() == "true",
-            api_format=os.getenv("LLM_API_FORMAT", "chat"),
-            timeout_seconds=float(os.getenv("LLM_TIMEOUT_SECONDS", "120")),
-            max_retries=int(os.getenv("LLM_MAX_RETRIES", "3")),
+            provider=pick("LLM_PROVIDER", "openai"),
+            api_key=pick("LLM_API_KEY", ""),
+            base_url=pick("LLM_BASE_URL", "https://api.openai.com/v1"),
+            model=pick("LLM_MODEL", "gpt-4o-mini"),
+            temperature=float(pick("LLM_TEMPERATURE", "0.7")),
+            max_tokens=int(pick("LLM_MAX_TOKENS", "24000")),
+            stream=pick("LLM_STREAM", "true").lower() == "true",
+            api_format=pick("LLM_API_FORMAT", "chat"),
+            timeout_seconds=float(pick("LLM_TIMEOUT_SECONDS", "120")),
+            max_retries=int(pick("LLM_MAX_RETRIES", "3")),
         )
 
     @staticmethod
